@@ -80,8 +80,13 @@ static void read_aux_switches()
         // invoke the appropriate function
         //do_aux_switch_function(g.ch7_option, ap.CH7_flag);
 		if (ap.CH7_flag) {
-			gcs_send_text_P(SEVERITY_HIGH, PSTR("Faking Baro from GPS!!"));
-			inertial_nav.set_fake_baro_with_gps(true);
+			if(gps.status()>4){//if not rtk state,cannot use gps height for alt control 
+				gcs_send_text_P(SEVERITY_HIGH, PSTR("Faking Baro from GPS!!"));
+				inertial_nav.set_fake_baro_with_gps(true);
+			}else {
+				gcs_send_text_P(SEVERITY_HIGH, PSTR("NEED GPS RTK!!"));	
+				inertial_nav.set_fake_baro_with_gps(false);				
+			}
 		} else {
 			gcs_send_text_P(SEVERITY_HIGH, PSTR("Using normal Baro data"));
 			inertial_nav.set_fake_baro_with_gps(false);

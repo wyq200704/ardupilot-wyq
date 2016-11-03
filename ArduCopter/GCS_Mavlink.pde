@@ -397,10 +397,10 @@ static void NOINLINE send_radio_out(mavlink_channel_t chan)
         hal.rcout->read(6),
         hal.rcout->read(7));
 }
-
+extern float deltaAlt_gps_baro,f_baro_alt;
 static void NOINLINE send_vfr_hud(mavlink_channel_t chan)
 {
-    mavlink_msg_vfr_hud_send(
+    /*mavlink_msg_vfr_hud_send(
         chan,
         gps.ground_speed(),
         gps.ground_speed(),
@@ -408,6 +408,17 @@ static void NOINLINE send_vfr_hud(mavlink_channel_t chan)
         g.rc_3.servo_out/10,
         current_loc.alt / 100.0f,
         climb_rate / 100.0f);
+	*/
+
+    mavlink_msg_vfr_hud_send(
+        chan,
+        deltaAlt_gps_baro/100.0f,
+        f_baro_alt/100.0f,
+        (ahrs.yaw_sensor / 100) % 360,
+        g.rc_3.servo_out/10,
+        current_loc.alt / 100.0f,
+        climb_rate / 100.0f);
+		
 }
 
 static void NOINLINE send_current_waypoint(mavlink_channel_t chan)

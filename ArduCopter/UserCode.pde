@@ -113,9 +113,22 @@ void userhook_MediumLoop()
 #endif
 
 #ifdef USERHOOK_SLOWLOOP
+extern bool use_gps_for_alt;
 void userhook_SlowLoop()
 {
     // put your 3.3Hz code here
+    static bool last_use_gps_for_alt=false;
+    if(last_use_gps_for_alt!=use_gps_for_alt)
+	{
+		if(use_gps_for_alt)
+		{
+			gcs_send_text_P(SEVERITY_HIGH ,PSTR("ALT Control Change:RTK GPS"));
+		}else
+		{
+			gcs_send_text_P(SEVERITY_HIGH ,PSTR("ALT Control Change:Baro"));	
+		}
+		last_use_gps_for_alt =use_gps_for_alt;
+	}
 }
 #endif
 

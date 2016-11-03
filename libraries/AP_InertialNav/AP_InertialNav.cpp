@@ -31,6 +31,7 @@ void AP_InertialNav::init()
     update_gains();
 }
 
+bool use_gps_for_alt; 
 // update - updates velocities and positions using latest info from ahrs and barometer if new data is available;
 void AP_InertialNav::update(float dt)
 {
@@ -44,6 +45,16 @@ void AP_InertialNav::update(float dt)
         _flags.ignore_error--;
     }
 
+	//add by wyq
+	
+    const AP_GPS &gps = _ahrs.get_gps();
+	if(gps.status()<5)
+	{
+		_fake_baro_with_gps = false;
+	}
+	use_gps_for_alt = _fake_baro_with_gps;
+	
+	//end
     // check if new baro readings have arrived and use them to correct vertical accelerometer offsets.
     check_baro();
 
@@ -232,11 +243,12 @@ int32_t AP_InertialNav::get_longitude() const
 
     return _ahrs.get_home().lng + (int32_t)(_position.y / _lon_to_cm_scaling);
 }
-
+float home_alt=0;
 // setup_home_position - reset state for home position change
 void AP_InertialNav::setup_home_position(int32_t alt)
 {
 	_home_alt = alt;
+	home_alt = _home_alt;
 	// set longitude to meters scaling to offset the shrinking longitude as we go towards the poles
     _lon_to_cm_scaling = longitude_scale(_ahrs.get_home()) * LATLON_TO_CM;
 
@@ -294,6 +306,8 @@ float AP_InertialNav::get_velocity_xy() const
 //
 // Z Axis methods
 //
+float deltaAlt_gps_baro=0;
+float f_baro_alt=0;
 
 // check_baro - check if new baro readings have arrived and use them to correct vertical accelerometer offsets
 void AP_InertialNav::check_baro()
@@ -305,8 +319,15 @@ void AP_InertialNav::check_baro()
     if( baro_update_time != _baro_last_update ) {
         const float dt = (float)(baro_update_time - _baro_last_update) * 0.001f; // in seconds
         // call correction method
+        float baro_alt = _baro.get_altitude()*100;
+		f_baro_alt = baro_alt;
+		const AP_GPS &gps = _ahrs.get_gps();
+		if(_fake_baro_with_gps)
+		{
+			deltaAlt_gps_baro = baro_alt-(gps.location().alt-_home_alt);
+		}
         if (!_fake_baro_with_gps) {
-			correct_with_baro(_baro.get_altitude()*100, dt);
+			correct_with_baro(baro_alt-deltaAlt_gps_baro, dt);
 		}
         _baro_last_update = baro_update_time;
     }
