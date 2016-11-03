@@ -19,7 +19,6 @@
 
 #include <GCS.h>
 #include <AP_AHRS.h>
-
 extern const AP_HAL::HAL& hal;
 
 uint32_t GCS_MAVLINK::last_radio_status_remrssi_ms;
@@ -339,7 +338,7 @@ void GCS_MAVLINK::handle_mission_count(AP_Mission &mission, mavlink_message_t *m
         mavlink_msg_mission_ack_send(chan, msg->sysid, msg->compid, MAV_MISSION_NO_SPACE);
         return;
     }
-
+	hal.uartD->printf("%d",mission.num_commands_max());
     // new mission arriving, truncate mission to be the same length
     mission.truncate(packet.count);
 
@@ -1073,6 +1072,7 @@ void GCS_MAVLINK::send_raw_imu(const AP_InertialSensor &ins, const Compass &comp
         mag2.y,
         mag2.z);        
 #endif
+
 }
 
 void GCS_MAVLINK::send_scaled_pressure(AP_Baro &barometer)

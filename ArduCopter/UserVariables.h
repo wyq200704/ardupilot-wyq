@@ -14,6 +14,25 @@ int                 WiiDisplacementX=0;
 int                 WiiDisplacementY=0;
 #endif  // WII_CAMERA
 
+unsigned int O2=0;
+unsigned int CO2=0;
+
+union b16 {
+	int N;
+	unsigned char B[2];
+};
+
+union b16 CO;
+union b16 NO;
+union b16 NO2;
+union b16 SO2;
+union b16 H2S;
+union b16 COC;
+union b16 NOC;
+union b16 NO2C;
+union b16 SO2C;
+union b16 H2SC;
+
 #endif  // USERHOOK_VARIABLES
 
 

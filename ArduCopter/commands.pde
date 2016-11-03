@@ -11,8 +11,8 @@ static void init_home()
 
     ahrs.set_home(loc);
 
-    inertial_nav.setup_home_position();
-
+    inertial_nav.setup_home_position(gps.location().alt);
+	
     // log new home position which mission library will pull from ahrs
     if (should_log(MASK_LOG_CMD)) {
         AP_Mission::Mission_Command temp_cmd;

@@ -5645,6 +5645,67 @@ static void mavlink_test_autopilot_version(uint8_t system_id, uint8_t component_
         MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
 }
 
+static void mavlink_test_raw_gas(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
+{
+	mavlink_message_t msg;
+        uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+        uint16_t i;
+	mavlink_raw_gas_t packet_in = {
+		93372036854775807ULL,
+	}17651,
+	}17755,
+	}17859,
+	}17963,
+	}18067,
+	}18171,
+	}18275,
+	}18379,
+	}18483,
+	};
+	mavlink_raw_gas_t packet1, packet2;
+        memset(&packet1, 0, sizeof(packet1));
+        	packet1.time_usec = packet_in.time_usec;
+        	packet1.O2 = packet_in.O2;
+        	packet1.CO2 = packet_in.CO2;
+        	packet1.CO = packet_in.CO;
+        	packet1.NO = packet_in.NO;
+        	packet1.NO2 = packet_in.NO2;
+        	packet1.SO2 = packet_in.SO2;
+        	packet1.H2S = packet_in.H2S;
+        	packet1.HH = packet_in.HH;
+        	packet1.LL = packet_in.LL;
+        
+        
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_raw_gas_encode(system_id, component_id, &msg, &packet1);
+	mavlink_msg_raw_gas_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_raw_gas_pack(system_id, component_id, &msg , packet1.time_usec , packet1.O2 , packet1.CO2 , packet1.CO , packet1.NO , packet1.NO2 , packet1.SO2 , packet1.H2S , packet1.HH , packet1.LL );
+	mavlink_msg_raw_gas_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_raw_gas_pack_chan(system_id, component_id, MAVLINK_COMM_0, &msg , packet1.time_usec , packet1.O2 , packet1.CO2 , packet1.CO , packet1.NO , packet1.NO2 , packet1.SO2 , packet1.H2S , packet1.HH , packet1.LL );
+	mavlink_msg_raw_gas_decode(&msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+
+        memset(&packet2, 0, sizeof(packet2));
+        mavlink_msg_to_send_buffer(buffer, &msg);
+        for (i=0; i<mavlink_msg_get_send_buffer_length(&msg); i++) {
+        	comm_send_ch(MAVLINK_COMM_0, buffer[i]);
+        }
+	mavlink_msg_raw_gas_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+        
+        memset(&packet2, 0, sizeof(packet2));
+	mavlink_msg_raw_gas_send(MAVLINK_COMM_1 , packet1.time_usec , packet1.O2 , packet1.CO2 , packet1.CO , packet1.NO , packet1.NO2 , packet1.SO2 , packet1.H2S , packet1.HH , packet1.LL );
+	mavlink_msg_raw_gas_decode(last_msg, &packet2);
+        MAVLINK_ASSERT(memcmp(&packet1, &packet2, sizeof(packet1)) == 0);
+}
+
 static void mavlink_test_v2_extension(uint8_t system_id, uint8_t component_id, mavlink_message_t *last_msg)
 {
 	mavlink_message_t msg;
@@ -6085,6 +6146,7 @@ static void mavlink_test_common(uint8_t system_id, uint8_t component_id, mavlink
 	mavlink_test_terrain_report(system_id, component_id, last_msg);
 	mavlink_test_battery_status(system_id, component_id, last_msg);
 	mavlink_test_autopilot_version(system_id, component_id, last_msg);
+	mavlink_test_raw_gas(system_id, component_id, last_msg);
 	mavlink_test_v2_extension(system_id, component_id, last_msg);
 	mavlink_test_memory_vect(system_id, component_id, last_msg);
 	mavlink_test_debug_vect(system_id, component_id, last_msg);

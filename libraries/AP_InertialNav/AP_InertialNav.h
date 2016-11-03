@@ -141,7 +141,7 @@ public:
     /**
        setup_home_position - reset on home position change
     */
-    void setup_home_position(void);
+    void setup_home_position(int32_t alt);
 
     //
     // Z Axis methods
@@ -198,6 +198,7 @@ public:
 
     // public variables
     Vector3f                accel_correction_hbf;       // horizontal body frame accelerometer corrections. here for logging purposes only
+	void			set_fake_baro_with_gps(bool fake) { _fake_baro_with_gps = fake; }
 
 protected:
 
@@ -208,7 +209,7 @@ protected:
      * @param lon : longitude in 100 nano degrees (i.e. degree value multiplied by 10,000,000)
      * @param lat : latitude  in 100 nano degrees (i.e. degree value multiplied by 10,000,000)
      */
-    void        correct_with_gps(uint32_t now, int32_t lon, int32_t lat);
+    float        correct_with_gps(uint32_t now, int32_t lon, int32_t lat);
 
     /**
      * check_gps - checks if new gps readings have arrived and calls correct_with_gps to
@@ -293,7 +294,8 @@ protected:
     GPS_Glitch&             _glitch_detector;           // GPS Glitch detector
     Baro_Glitch&            _baro_glitch;               // Baro glitch detector
     uint8_t                 _error_count;               // number of missed GPS updates
-
+	bool                    _fake_baro_with_gps;
+    int32_t                 _home_alt;
 };
 
 #if AP_AHRS_NAVEKF_AVAILABLE

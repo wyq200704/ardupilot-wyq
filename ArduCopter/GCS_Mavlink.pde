@@ -545,6 +545,15 @@ bool GCS_MAVLINK::try_send_message(enum ap_message id)
     case MSG_RAW_IMU1:
         CHECK_PAYLOAD_SIZE(RAW_IMU);
         gcs[chan-MAVLINK_COMM_0].send_raw_imu(ins, compass);
+        mavlink_msg_raw_gas_send(
+			chan,
+			hal.scheduler->millis(),
+			O2,
+			CO2,
+			CO.N,
+			NO.N,
+			NO2.N,
+			SO2.N,0,0,0);		
         break;
 
     case MSG_RAW_IMU2:

@@ -244,14 +244,14 @@ bool AP_GPS_NMEA::_term_complete()
                 case _GPS_SENTENCE_GPRMC:
                     //time                        = _new_time;
                     //date                        = _new_date;
-                    state.location.lat     = _new_latitude;
-                    state.location.lng     = _new_longitude;
+                    //state.location.lat     = _new_latitude;
+                    //state.location.lng     = _new_longitude;
                     state.ground_speed     = _new_speed*0.01f;
                     state.ground_course_cd = _new_course;
                     make_gps_time(_new_date, _new_time * 10);
                     state.last_gps_time_ms = hal.scheduler->millis();
                     // To-Do: add support for proper reporting of 2D and 3D fix
-                    state.status           = AP_GPS::GPS_OK_FIX_3D;
+                    //state.status           = AP_GPS::GPS_OK_FIX_3D;
                     fill_3d_velocity();
                     break;
                 case _GPS_SENTENCE_GPGGA:
@@ -261,7 +261,16 @@ bool AP_GPS_NMEA::_term_complete()
                     state.num_sats      = _new_satellite_count;
                     state.hdop          = _new_hdop;
                     // To-Do: add support for proper reporting of 2D and 3D fix
-                    state.status        = AP_GPS::GPS_OK_FIX_3D;
+                    switch(_new_fix)
+					{
+						case 1:state.status        = AP_GPS::GPS_OK_FIX_3D; break;
+						case 2:state.status        = AP_GPS::GPS_OK_FIX_3D_DGPS; break;
+						case 3:state.status        = AP_GPS::GPS_OK_FIX_3D_DGPS; break;	
+						case 4:state.status        = AP_GPS::GPS_OK_FIX_3D_RTK; break;
+						case 5:state.status        = AP_GPS::GPS_OK_FIX_3D_RTK; break;	
+                    }
+
+					
                     break;
                 case _GPS_SENTENCE_GPVTG:
                     state.ground_speed     = _new_speed*0.01f;
@@ -312,6 +321,7 @@ bool AP_GPS_NMEA::_term_complete()
             break;
         case _GPS_SENTENCE_GPGGA + 6: // Fix data (GGA)
             _gps_data_good = _term[0] > '0';
+			_new_fix = _term[0]-'0';
             break;
         case _GPS_SENTENCE_GPVTG + 9: // validity (VTG) (we may not see this field)
             _gps_data_good = _term[0] != 'N';
